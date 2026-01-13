@@ -2,7 +2,11 @@ import OpenAI from "openai";
 import type { ChatCompletionTool } from "openai/resources.js";
 import type { ChatCompletionMessageParam, ChatCompletionCreateParams, ChatCompletionToolChoiceOption } from "openai/resources/chat/completions";
 
-export type ChatRole = "system" | "user" | "assistant" | "tool";
+export enum ChatRole {
+  SYSTEM = "system",
+  USER = "user",
+  ASSISTANT = "assistant",
+}
 
 export enum AIModel {
   GPT4oMini = "gpt-4o-mini",
