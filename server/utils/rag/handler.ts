@@ -92,11 +92,20 @@ class RAG extends AI {
     return results.map((row: any) => row.content);
   }
 
-  async getMemoryItems(userId: string): Promise<UserMemory[]> {
+  async getMemoryItems(userId: string, { take, skip }: { take?: number; skip?: number }): Promise<UserMemory[]> {
     const memories = await this.prisma.userMemory.findMany({
       where: { userId },
+      take,
+      skip,
     });
     return memories;
+  }
+
+  async countMemoryItems(userId: string): Promise<number> {
+    const count = await this.prisma.userMemory.count({
+      where: { userId },
+    });
+    return count;
   }
 
   async saveMemory(userId: string, content: string): Promise<UserMemory> {
@@ -264,8 +273,7 @@ class RAG extends AI {
           },
           // Continue for the duration specified
         ]
-      }
-      `;
+      }`;
 
     const messages = [
       { role: ChatRole.USER, content: prompt }
@@ -274,7 +282,7 @@ class RAG extends AI {
     const response = await this.chatResponse(userId, messages, { temperature: 0.7, max_tokens: 10000 });
 
     try {
-      const dietPlanJson = JSON.parse(response?.choices[0]?.message?.content ?? "");
+      const dietPlanJson: DietPlan = JSON.parse(response?.choices[0]?.message?.content ?? "");
       return dietPlanJson;
     } catch (error) {
       throw new Error("Failed to parse diet plan JSON response");
